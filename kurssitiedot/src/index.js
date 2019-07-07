@@ -49,15 +49,16 @@ const App = () =>{
     />)
     
     let sum = 0
-   
-    course.parts.map(item => sum += item.exercises)
-    
+    const total = course.parts.reduce((s, p) => {
+        return s + p.exercises
+    }, sum)
+
     return(
         
         <div>
             <h2>{course.name}</h2>
             {part}
-            <p><b>Total of {sum} exercises</b></p>
+            <p><b>Total of {total} exercises</b></p>
         </div>
         
     )
