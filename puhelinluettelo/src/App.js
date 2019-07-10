@@ -15,24 +15,41 @@ function App() {
     {name: 'Arto Hallas'}
   ])
     
-  const [newName, setNewNAme] = useState('')
+  const [newName, setNewName] = useState('')
   
   const lue = () => persons.map(item => <Note
     key = {item.name}
     note = {item}
   />)
 
+  const onKo = (value) => {
+    for(let i = 0; i < persons.length; i++){
+      if(persons[i].name === value){
+        return true
+      }
+      
+  }
+  return false
+}
+
   const addName = (event) => {
     event.preventDefault()
-    const inputObject = {
+    const newObject = {
       name: newName
     }
-    setPersons(persons.concat(inputObject))
-    setNewNAme("")
+
+    if(onKo(newName)){
+      alert(`${newName} is already added to phonebook`)
+      setNewName("")
+      return
+    }else{
+      setPersons(persons.concat(newObject))
+    }
+    setNewName("")
   }
 
   const inputHandler = (event) => {
-    setNewNAme(event.target.value)
+    setNewName(event.target.value)
   }
 
   return (
@@ -53,7 +70,8 @@ function App() {
         </div>
       </form>
       <h2>Numbers</h2>  
-      {lue()}  
+      {lue()} 
+      <br/><br/>
     </div>
   );
 }
