@@ -4,7 +4,7 @@ const Note = (props) => {
   return(
     <div>
       <li>
-        {props.note.name}
+        {props.note.name} {props.note.number}
       </li>
     </div>
   )
@@ -12,10 +12,14 @@ const Note = (props) => {
 
 function App() {
   const [persons, setPersons] = useState([
-    {name: 'Arto Hallas'}
+    {name: 'Arto Hallas',
+    number: '2134567'
+  }
   ])
     
-  const [newName, setNewName] = useState('')
+  const [newName, setNewName] = useState("")
+
+  const [newNumber, setNewNumber] = useState("")
   
   const lue = () => persons.map(item => <Note
     key = {item.name}
@@ -26,8 +30,7 @@ function App() {
     for(let i = 0; i < persons.length; i++){
       if(persons[i].name === value){
         return true
-      }
-      
+      } 
   }
   return false
 }
@@ -35,21 +38,26 @@ function App() {
   const addName = (event) => {
     event.preventDefault()
     const newObject = {
-      name: newName
+      name: newName,
+      number: newNumber
     }
-
     if(onKo(newName)){
       alert(`${newName} is already added to phonebook`)
       setNewName("")
-      return
     }else{
       setPersons(persons.concat(newObject))
     }
     setNewName("")
+    setNewNumber("")
   }
 
-  const inputHandler = (event) => {
+  const nameHandler = (event) => {
     setNewName(event.target.value)
+  
+  }
+
+  const numberHandler = (event) => {
+    setNewNumber(event.target.value)
   }
 
   return (
@@ -58,11 +66,20 @@ function App() {
       <form onSubmit = {addName}>
           <div>
             name: <input 
-              value = {newName}
-              onChange = {inputHandler}
-            />
-        </div>
-        <div>
+              value = {newName}  
+              
+              onChange = {nameHandler}
+            /><br/>
+            number: <input
+              value = {newNumber}
+              
+              onChange = {numberHandler}
+          />
+          </div>
+          <div>
+            
+          </div>
+          <div>
           <button type = "submit"
           >
             add
