@@ -1,8 +1,9 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 
 import UusiHenkilo from "./UusiHenkilo"
 import Filter from "./Filter"
 import Persons from "./Persons"
+import Axios from 'axios';
 
 const Note = (props) => {
   return(
@@ -15,20 +16,22 @@ const Note = (props) => {
 }
 
 function App() {
+  const getData = () => {
+    Axios
+    .get('http://localhost:3001/persons')
+    .then(response => {
+      setPersons(response.data)
+    })
+  }
+
+  useEffect(getData, [])
+  
   const [persons, setPersons] = useState([
-    {name: "Arto Hallas",
-    number: "040-123456"
-    }, 
-    {
-      name: "Aku Ankka",
-      number: "040-555231"
-    },
-    {
-      name: "Nadja Abramov",
-      number: "12-43-235698"
-    }
+    
 
   ])
+
+  
     
   const [newName, setNewName] = useState("")
 
