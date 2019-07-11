@@ -12,19 +12,37 @@ const Note = (props) => {
 
 function App() {
   const [persons, setPersons] = useState([
-    {name: 'Arto Hallas',
-    number: '2134567'
-  }
+    {name: "Arto Hallas",
+    number: "040-123456"
+    }, 
+    {
+      name: "Aku Ankka",
+      number: "040-555231"
+    },
+    {
+      name: "Nadja Abramov",
+      number: "12-43-235698"
+    }
+
   ])
     
   const [newName, setNewName] = useState("")
 
   const [newNumber, setNewNumber] = useState("")
+
+  const [filterName, setFilter] = useState("")
   
   const lue = () => persons.map(item => <Note
     key = {item.name}
     note = {item}
   />)
+
+  const lueFilter = (taht) => persons.filter(word => 
+    word.name[0] === taht.toUpperCase()).map(item =>
+    <Note
+      key = {item.name}
+      note = {item} 
+    />)
 
   const onKo = (value) => {
     for(let i = 0; i < persons.length; i++){
@@ -63,6 +81,12 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
+      <div>
+        filter shown with <input
+          onChange = {(event) => setFilter(event.target.value)}
+        />
+        <h2>add a new</h2>
+      </div>
       <form onSubmit = {addName}>
           <div>
             name: <input 
@@ -87,7 +111,7 @@ function App() {
         </div>
       </form>
       <h2>Numbers</h2>  
-      {lue()} 
+      {filterName.length > 0 ? lueFilter(filterName) : lue()} 
       <br/><br/>
     </div>
   );
