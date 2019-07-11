@@ -1,5 +1,9 @@
 import React, {useState} from 'react'
 
+import UusiHenkilo from "./UusiHenkilo"
+import Filter from "./Filter"
+import Persons from "./Persons"
+
 const Note = (props) => {
   return(
     <div>
@@ -49,9 +53,9 @@ function App() {
       if(persons[i].name === value){
         return true
       } 
+    }
+    return false
   }
-  return false
-}
 
   const addName = (event) => {
     event.preventDefault()
@@ -81,38 +85,21 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input
-          onChange = {(event) => setFilter(event.target.value)}
-        />
-        <h2>add a new</h2>
-      </div>
-      <form onSubmit = {addName}>
-          <div>
-            name: <input 
-              value = {newName}  
-              
-              onChange = {nameHandler}
-            /><br/>
-            number: <input
-              value = {newNumber}
-              
-              onChange = {numberHandler}
-          />
-          </div>
-          <div>
-            
-          </div>
-          <div>
-          <button type = "submit"
-          >
-            add
-          </button>
-        </div>
-      </form>
-      <h2>Numbers</h2>  
-      {filterName.length > 0 ? lueFilter(filterName) : lue()} 
-      <br/><br/>
+      <Filter
+        onChange = {(event) => setFilter(event.target.value)}
+      />
+      <h2>add a new</h2>
+      <UusiHenkilo 
+        addName = {addName}
+        newName = {newName}
+        newNumber = {newNumber}
+        nameHandler = {nameHandler}
+        numberHandler = {numberHandler}
+      />
+      <h2>Numbers</h2> 
+      <Persons
+        showPersons =  {filterName.length > 0 ? lueFilter(filterName) : lue()}
+      /> 
     </div>
   );
 }
