@@ -11,6 +11,7 @@ const Tiedot = (props) => {
 
 function App() {
   const [country, setCountry] = useState([])
+  const [inx, setInx] = useState("")
   
   const [filter, setFilter] = useState("")
 
@@ -27,45 +28,80 @@ function App() {
 
   const filterHandler = (event) => {
     setFilter(event.target.value)
+    setInx("")
   }
   
-  const re = country.filter(item => item.name.toLowerCase().startsWith(filter))
+  const re = country.filter(item => 
+    item.name.toLowerCase().startsWith(filter))
 
   const read = () => {
-    const result = re.map(item => <p key = {item.name}>
+    const result = re.map((item, i) => <p key = {item.name}>
       {item.name}
+      <button onClick = {showHandler} value = {item.name}>show</button>
     </p>)
     return result
   }
-  
+
   const isFilter = filter.length > 0 ? true : false
+
+  
+  const readData = () => {
+    const data = re.map(item => <div key = {item.name}>
+      <h2>{item.name}</h2>
+      Capital {item.capital}<br/>
+      Population {item.population}
+      <h2>Languages</h2>
+      <ul>
+        {item.languages.map(language => <li key = {language.name}>{language.name}</li>)}
+      </ul>
+      <img src = {item.flag} style = {{width: 100}} alt = "lipp"/><br/>
+    </div>
+    )
+      
+    return data
+  }
+
+  const readButton = (nimi) => {
+  
+    const butData = re.map(item => nimi === item.name ? <div key = {item.name}>
+      <h2>{item.name}</h2>
+      Capital {item.capital}<br/>
+      Population {item.population}
+      <h2>Languages</h2>
+      <ul>
+        {item.languages.map(language => <li key = {language.name}>{language.name}</li>)}
+      </ul>
+      <img src = {item.flag} style = {{width: 100}} alt = "lipp"/><br/>
+    </div> : null
+    )
+    return butData
+  }
 
   const showCountries = () => {
     if(isFilter){
       if(re.length === 1){
-        return <div>
-          <h2>{re[0].name}</h2><br/>
-          Capital {re[0].capital}<br/>
-          Population {re[0].population}
-          <h2>Languages</h2>
-          <ul>
-          {re[0].languages.map(language => <li>{language.name}</li>)}
-          </ul>
-          <br/>
-          <img src = {re[0].flag} style = {{width: 100}}/><br/>
-        </div>
+        return <div>{readData(inx)}</div>
       }
       else if(re.length < 10){
-        return <div>
-          {read()}
-        </div>   
+        return <div>{inx.length > 0 ? readButton(inx) : read()}</div>
       }
       else {
       return <p>Too many matches, specify another filter</p>
       }
     }
   }
-  
+
+  const ret = re.filter(item => item[inx])
+
+  console.log(ret.map(i => i.name))
+
+  let maa = ""
+
+  const showHandler = (event) => {
+    maa = event.target.value
+    setInx(maa)   
+  }
+
   return (
     <div>
       find countries: <input
