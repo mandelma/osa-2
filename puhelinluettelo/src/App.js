@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import axios from "axios"
+import henkiloTiedot from "./service/personData"
 
 import UusiHenkilo from "./UusiHenkilo"
 import Filter from "./Filter"
@@ -30,18 +31,13 @@ function App() {
     note = {item}
   />)
 
- 
-  const getData = () => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
-  }
-
-  useEffect(getData, [])
-
-  
+  useEffect(() => {
+    henkiloTiedot
+      .getAll()
+        .then(initialNotes => {
+          setPersons(initialNotes)
+        })
+  }, [])
 
   const lueFilter = (taht) => persons.filter(word => 
     word.name[0] === taht.toUpperCase()).map(item =>
@@ -70,12 +66,13 @@ function App() {
       alert(`${newName} is already added to phonebook`)
       setNewName("")
     }else{
-      axios
-        .post('http://localhost:3001/persons', newObject)
-        .then(response => {
-          setPersons(persons.concat(response.data))
-          
-      })
+      henkiloTiedot
+        .create(newObject)
+          .then(returnedNote => {
+            setPersons(persons.concat(returnedNote))
+            setNewName("")
+            setNewNumber("")
+          })
     }
     
     setNewName("")
