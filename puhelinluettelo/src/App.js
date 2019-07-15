@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import axios from "axios"
 
 import UusiHenkilo from "./UusiHenkilo"
 import Filter from "./Filter"
@@ -16,22 +17,7 @@ const Note = (props) => {
 }
 
 function App() {
-  const getData = () => {
-    Axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      setPersons(response.data)
-    })
-  }
-
-  useEffect(getData, [])
-  
-  const [persons, setPersons] = useState([
-    
-
-  ])
-
-  
+  const [persons, setPersons] = useState([])
     
   const [newName, setNewName] = useState("")
 
@@ -43,6 +29,19 @@ function App() {
     key = {item.name}
     note = {item}
   />)
+
+ 
+  const getData = () => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }
+
+  useEffect(getData, [])
+
+  
 
   const lueFilter = (taht) => persons.filter(word => 
     word.name[0] === taht.toUpperCase()).map(item =>
@@ -66,12 +65,19 @@ function App() {
       name: newName,
       number: newNumber
     }
+    
     if(onKo(newName)){
       alert(`${newName} is already added to phonebook`)
       setNewName("")
     }else{
-      setPersons(persons.concat(newObject))
+      axios
+        .post('http://localhost:3001/persons', newObject)
+        .then(response => {
+          setPersons(persons.concat(response.data))
+          
+      })
     }
+    
     setNewName("")
     setNewNumber("")
   }

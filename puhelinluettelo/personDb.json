@@ -1,0 +1,44 @@
+{
+  "persons": [
+    {
+      "id": 1,
+      "name": "Arto Hallas",
+      "number": "040-123456"
+    },
+    {
+      "id": 2,
+      "name": "Aku Ankka",
+      "number": "040-555231"
+    },
+    {
+      "id": 3,
+      "name": "Dan Abramov",
+      "number": "12-46-789542"
+    },
+    {
+      "name": "Marina",
+      "number": "123",
+      "id": 4
+    },
+    {
+      "name": "Maria Kadakas",
+      "number": "123546987",
+      "id": 5
+    },
+    {
+      "name": "Pekka Jussila",
+      "number": "44422111",
+      "id": 6
+    },
+    {
+      "name": "",
+      "number": "",
+      "id": 7
+    },
+    {
+      "name": "Lia Lisa",
+      "number": "12121212",
+      "id": 8
+    }
+  ]
+}
