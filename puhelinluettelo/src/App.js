@@ -1,25 +1,25 @@
 import React, {useState, useEffect} from 'react'
-import axios from "axios"
 import henkiloTiedot from "./service/personData"
 
 import UusiHenkilo from "./UusiHenkilo"
 import Filter from "./Filter"
 import Persons from "./Persons"
-import Axios from 'axios';
 
 const Note = (props) => {
   return(
     <div>
       <li>
         {props.note.name} {props.note.number}
+        <button onClick = {props.del}>Delete</button>
       </li>
+      
     </div>
   )
 }
 
 function App() {
   const [persons, setPersons] = useState([])
-    
+         
   const [newName, setNewName] = useState("")
 
   const [newNumber, setNewNumber] = useState("")
@@ -29,6 +29,7 @@ function App() {
   const lue = () => persons.map(item => <Note
     key = {item.name}
     note = {item}
+    del = {() => deletePerson(item.id, item.name)}
   />)
 
   useEffect(() => {
@@ -39,12 +40,25 @@ function App() {
         })
   }, [])
 
-  const lueFilter = (taht) => persons.filter(word => 
-    word.name[0] === taht.toUpperCase()).map(item =>
+  const lueFilter = () => persons.filter(word => 
+    word.name.toLowerCase().startsWith(filterName)).map(item =>
     <Note
       key = {item.name}
-      note = {item} 
+      note = {item}
+      del = {() => deletePerson(item.id, item.name)}
     />)
+
+  const deletePerson = (id, name) => {
+    if(window.confirm(`Delete ${name} ?`)){
+      henkiloTiedot
+      .delPyynto(id)
+      .then(returned => {
+        setPersons(persons.filter(i => i.id !== id))
+      })
+    }
+    
+    
+  }
 
   const onKo = (value) => {
     for(let i = 0; i < persons.length; i++){
@@ -104,7 +118,8 @@ function App() {
       />
       <h2>Numbers</h2> 
       <Persons
-        showPersons =  {filterName.length > 0 ? lueFilter(filterName) : lue()}
+        showPersons =  {filterName.length > 0
+        ? lueFilter() : lue()}
       /> 
     </div>
   );
