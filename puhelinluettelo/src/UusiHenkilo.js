@@ -3,7 +3,7 @@ import React from "react"
 const UusiHenkilo = (props) => {
     return(
         <div>
-            <form onSubmit = {props.addName}>
+            <form onSubmit = {props.addPerson}>
                 <div>
                 name: <input 
                     value = {props.newName}  

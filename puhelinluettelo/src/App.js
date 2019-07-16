@@ -56,11 +56,9 @@ function App() {
         setPersons(persons.filter(i => i.id !== id))
       })
     }
-    
-    
   }
 
-  const onKo = (value) => {
+  const onkoNimi = (value) => {
     for(let i = 0; i < persons.length; i++){
       if(persons[i].name === value){
         return true
@@ -69,16 +67,43 @@ function App() {
     return false
   }
 
-  const addName = (event) => {
+  const onkoNumero = (value) => {
+    for(let i = 0; i < persons.length; i++){
+      if(persons[i].number !== value){
+        return true
+      } 
+    }
+    return false
+  }
+
+  let id = 0
+
+  persons.forEach(element => {
+    if(element.name === newName){
+      id = element.id
+    }
+  });
+
+
+  const addPerson = (event) => {
     event.preventDefault()
     const newObject = {
       name: newName,
       number: newNumber
     }
-    
-    if(onKo(newName)){
-      alert(`${newName} is already added to phonebook`)
-      setNewName("")
+
+    if(onkoNimi(newName) && onkoNumero(newNumber)){
+      alert(`${newName} is already added to phonebook,
+      replace the old number with a new one?`)
+      const note = persons.find(note => note.id === id)
+      const newNote = {...note, number: newNumber}
+      henkiloTiedot
+        .update(id, newNote)
+        .then(returnedNote => {
+          setPersons(persons.map(item => item.id !== id ? item : returnedNote))
+          setNewName("")
+          setNewNumber("")
+      })
     }else{
       henkiloTiedot
         .create(newObject)
@@ -88,9 +113,6 @@ function App() {
             setNewNumber("")
           })
     }
-    
-    setNewName("")
-    setNewNumber("")
   }
 
   const nameHandler = (event) => {
@@ -110,7 +132,7 @@ function App() {
       />
       <h2>add a new</h2>
       <UusiHenkilo 
-        addName = {addName}
+        addPerson = {addPerson}
         newName = {newName}
         newNumber = {newNumber}
         nameHandler = {nameHandler}
