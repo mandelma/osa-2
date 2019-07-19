@@ -5,6 +5,8 @@ import UusiHenkilo from "./UusiHenkilo"
 import Filter from "./Filter"
 import Persons from "./Persons"
 
+import "./index.css"
+
 const Note = (props) => {
   return(
     <div>
@@ -12,9 +14,32 @@ const Note = (props) => {
         {props.note.name} {props.note.number}
         <button onClick = {props.del}>Delete</button>
       </li>
-      
     </div>
   )
+}
+
+const ErrorNotification = (props) => {
+  if(props.errMessage === null){
+    return null
+  }
+
+  return(
+    <div className = "error">
+      {props.errMessage}
+    </div>
+  )
+}
+
+const MessageNotification = (props) => {
+  if(props.message === null){
+    return null
+  }
+
+  return(
+    <div className = "message">
+      {props.message}
+    </div>
+  ) 
 }
 
 function App() {
@@ -25,6 +50,10 @@ function App() {
   const [newNumber, setNewNumber] = useState("")
 
   const [filterName, setFilter] = useState("")
+
+  const [message, setMessage] = useState(null)
+
+  const [errorMessage, setErrorMessage] = useState(null)
   
   const lue = () => persons.map(item => <Note
     key = {item.name}
@@ -54,6 +83,24 @@ function App() {
       .delPyynto(id)
       .then(returned => {
         setPersons(persons.filter(i => i.id !== id))
+        if(errorMessage === null){
+          setMessage(
+            `${name} is deleted from phonebook`
+          )
+          setTimeout(() => {
+            setMessage(null)
+          }, 3000)
+        }
+      })
+
+      .catch(error  => {
+        setErrorMessage(
+          `information of ${name} is already removed from server`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 3000)
+        setPersons(persons.filter(n => n.id !== id))
       })
     }
   }
@@ -76,15 +123,6 @@ function App() {
     return false
   }
 
-  let id = 0
-
-  persons.forEach(element => {
-    if(element.name === newName){
-      id = element.id
-    }
-  });
-
-
   const addPerson = (event) => {
     event.preventDefault()
     const newObject = {
@@ -92,26 +130,62 @@ function App() {
       number: newNumber
     }
 
+    let id = 0
+    persons.forEach(element => {
+      if(element.name === newName){
+        id = element.id
+      }
+    });
+
     if(onkoNimi(newName) && onkoNumero(newNumber)){
       alert(`${newName} is already added to phonebook,
       replace the old number with a new one?`)
       const note = persons.find(note => note.id === id)
       const newNote = {...note, number: newNumber}
+      
       henkiloTiedot
         .update(id, newNote)
         .then(returnedNote => {
           setPersons(persons.map(item => item.id !== id ? item : returnedNote))
+
+          if(errorMessage === null){
+            setMessage(
+              `${newName} new number is set`
+            )
+            setTimeout(() => {
+              setMessage(null)
+            }, 3000)
+          }
           setNewName("")
           setNewNumber("")
-      })
+          })
+          .catch(error  => {
+            setErrorMessage(
+              `information of ${newName} is already removed from server`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 3000)
+            setPersons(persons.filter(n => n.id !== id))
+          })  
+          setNewName("")
+          setNewNumber("")
+          
     }else{
       henkiloTiedot
         .create(newObject)
           .then(returnedNote => {
             setPersons(persons.concat(returnedNote))
-            setNewName("")
             setNewNumber("")
+            setMessage(
+              `${newName} is added to phonebook`
+            )
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
           })
+          setNewName("")
+          setNewNumber("")  
     }
   }
 
@@ -127,8 +201,16 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
+      <ErrorNotification 
+        errMessage = {errorMessage}
+        />
+      <MessageNotification 
+        message = {message}
+      />
+      <br/>
       <Filter
         onChange = {(event) => setFilter(event.target.value)}
+
       />
       <h2>add a new</h2>
       <UusiHenkilo 
