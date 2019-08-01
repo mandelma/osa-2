@@ -95,7 +95,7 @@ function App() {
 
       .catch(error  => {
         setErrorMessage(
-          `information of ${name} is already removed from server`
+          `info of ${name} is already removed from server`
         )
         setTimeout(() => {
           setErrorMessage(null)
@@ -116,7 +116,7 @@ function App() {
 
   const onkoNumero = (value) => {
     for(let i = 0; i < persons.length; i++){
-      if(persons[i].number !== value){
+      if(persons[i].number === value){
         return true
       } 
     }
@@ -137,37 +137,43 @@ function App() {
       }
     });
 
-    if(onkoNimi(newName) && onkoNumero(newNumber)){
-      alert(`${newName} is already added to phonebook,
-      replace the old number with a new one?`)
-      const note = persons.find(note => note.id === id)
-      const newNote = {...note, number: newNumber}
+    if(onkoNimi(newName) || onkoNumero(newNumber)){
+      //alert(`${newName} is already added to phonebook`)
+      setErrorMessage(
+                `Name or number is already in phonebook`
+              )
+              setTimeout(() => {
+                setErrorMessage(null)
+              }, 3000)
+      // replace the old number with a new one?
+      //const note = persons.find(note => note.id === id)
+      //const newNote = {...note, number: newNumber}
       
-      henkiloTiedot
-        .update(id, newNote)
-        .then(returnedNote => {
-          setPersons(persons.map(item => item.id !== id ? item : returnedNote))
+      //henkiloTiedot
+      //  .update(id, newNote)
+      //  .then(returnedNote => {
+      //    setPersons(persons.map(item => item.id !== id ? item : returnedNote))
 
-          if(errorMessage === null){
-            setMessage(
-              `${newName} new number is set`
-            )
-            setTimeout(() => {
-              setMessage(null)
-            }, 3000)
-          }
-          setNewName("")
-          setNewNumber("")
-          })
-          .catch(error  => {
-            setErrorMessage(
-              `information of ${newName} is already removed from server`
-            )
-            setTimeout(() => {
-              setErrorMessage(null)
-            }, 3000)
-            setPersons(persons.filter(n => n.id !== id))
-          })  
+      //  if(errorMessage === null){
+      //      setMessage(
+      //        `${newName} new number is set`
+      //      )
+      //      setTimeout(() => {
+      //        setMessage(null)
+      //      }, 3000)
+      //    }
+      //    setNewName("")
+      //    setNewNumber("")
+      //    })
+      //    .catch(error  => {
+      //      setErrorMessage(
+      //        `information of ${newName} is already removed from server`
+      //      )
+      //      setTimeout(() => {
+      //        setErrorMessage(null)
+      //      }, 3000)
+      //      setPersons(persons.filter(n => n.id !== id))
+      //    })  
           setNewName("")
           setNewNumber("")
           
