@@ -78,7 +78,9 @@ function App() {
     />)
 
   const deletePerson = (id, name) => {
+    console.log("Delete test")
     if(window.confirm(`Delete ${name} ?`)){
+      
       henkiloTiedot
       .delPyynto(id)
       .then(returned => {
@@ -140,7 +142,7 @@ function App() {
     if(onkoNimi(newName) || onkoNumero(newNumber)){
       //alert(`${newName} is already added to phonebook`)
       setErrorMessage(
-                `Name or number is already in phonebook`
+                `Nimi ja numero on jo kirjassa`
               )
               setTimeout(() => {
                 setErrorMessage(null)
