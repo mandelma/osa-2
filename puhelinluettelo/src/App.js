@@ -43,6 +43,10 @@ const MessageNotification = (props) => {
 }
 
 function App() {
+
+  
+
+
   const [persons, setPersons] = useState([])
          
   const [newName, setNewName] = useState("")
@@ -54,12 +58,6 @@ function App() {
   const [message, setMessage] = useState(null)
 
   const [errorMessage, setErrorMessage] = useState(null)
-  
-  const lue = () => persons.map(item => <Note
-    key = {item.name}
-    note = {item}
-    del = {() => deletePerson(item.id, item.name)}
-  />)
 
   useEffect(() => {
     henkiloTiedot
@@ -68,6 +66,15 @@ function App() {
           setPersons(initialNotes)
         })
   }, [])
+
+  
+  const lue = () => persons.map(item => <Note
+    key = {item.name}
+    note = {item}
+    del = {() => deletePerson(item.id, item.name)}
+  />)
+
+  
 
   const lueFilter = () => persons.filter(word => 
     word.name.toLowerCase().startsWith(filterName)).map(item =>
@@ -78,16 +85,17 @@ function App() {
     />)
 
   const deletePerson = (id, name) => {
-    console.log("Delete test")
     if(window.confirm(`Delete ${name} ?`)){
+      //const personId = persons.find(note => note.id === id)
       
       henkiloTiedot
       .delPyynto(id)
       .then(returned => {
         setPersons(persons.filter(i => i.id !== id))
+        console.log("Id on " + id)
         if(errorMessage === null){
           setMessage(
-            `${name} is deleted from phonebook`
+            `${name} is deleted, from phonebook`
           )
           setTimeout(() => {
             setMessage(null)
@@ -116,15 +124,7 @@ function App() {
     return false
   }
 
-  const onkoNumero = (value) => {
-    for(let i = 0; i < persons.length; i++){
-      if(persons[i].number === value){
-        return true
-      } 
-    }
-    return false
-  }
-
+  
   const addPerson = (event) => {
     event.preventDefault()
     const newObject = {
@@ -139,43 +139,37 @@ function App() {
       }
     });
 
-    if(onkoNimi(newName) || onkoNumero(newNumber)){
-      //alert(`${newName} is already added to phonebook`)
-      setErrorMessage(
-                `Nimi ja numero on jo kirjassa`
-              )
-              setTimeout(() => {
-                setErrorMessage(null)
-              }, 3000)
-      // replace the old number with a new one?
-      //const note = persons.find(note => note.id === id)
-      //const newNote = {...note, number: newNumber}
-      
-      //henkiloTiedot
-      //  .update(id, newNote)
-      //  .then(returnedNote => {
-      //    setPersons(persons.map(item => item.id !== id ? item : returnedNote))
+    if(onkoNimi(newName)){
+      alert(`${newName} is already added to phonebook. Replace the old number with a new one?`)
 
-      //  if(errorMessage === null){
-      //      setMessage(
-      //        `${newName} new number is set`
-      //      )
-      //      setTimeout(() => {
-      //        setMessage(null)
-      //      }, 3000)
-      //    }
-      //    setNewName("")
-      //    setNewNumber("")
-      //    })
-      //    .catch(error  => {
-      //      setErrorMessage(
-      //        `information of ${newName} is already removed from server`
-      //      )
-      //      setTimeout(() => {
-      //        setErrorMessage(null)
-      //      }, 3000)
-      //      setPersons(persons.filter(n => n.id !== id))
-      //    })  
+      const note = persons.find(note => note.id === id)
+      const newNote = {...note, number: newNumber}
+      
+      henkiloTiedot
+        .update(id, newNote)
+        .then(returnedNote => {
+          setPersons(persons.map(item => item.id !== id ? item : returnedNote))
+
+        if(errorMessage === null){
+            setMessage(
+              `${newName} new number is set`
+            )
+            setTimeout(() => {
+              setMessage(null)
+            }, 3000)
+          }
+          setNewName("")
+          setNewNumber("")
+          })
+          .catch(error  => {
+            setErrorMessage(
+              `information of ${newName} is already removed from server`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 3000)
+            setPersons(persons.filter(n => n.id !== id))
+          })  
           setNewName("")
           setNewNumber("")
           
