@@ -1,10 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import henkiloTiedot from "./service/personData"
-
 import UusiHenkilo from "./UusiHenkilo"
 import Filter from "./Filter"
 import Persons from "./Persons"
-
 import "./index.css"
 
 const Note = (props) => {
@@ -22,7 +20,6 @@ const ErrorNotification = (props) => {
   if(props.errMessage === null){
     return null
   }
-
   return(
     <div className = "error">
       {props.errMessage}
@@ -34,7 +31,6 @@ const MessageNotification = (props) => {
   if(props.message === null){
     return null
   }
-
   return(
     <div className = "message">
       {props.message}
@@ -42,10 +38,7 @@ const MessageNotification = (props) => {
   ) 
 }
 
-function App() {
-
-  
-
+function App(props) {
 
   const [persons, setPersons] = useState([])
          
@@ -59,6 +52,23 @@ function App() {
 
   const [errorMessage, setErrorMessage] = useState(null)
 
+  
+ 
+  const lue = () => persons.map(item =><Note
+    key = {item.id}
+    note = {item}
+    del = {() => deletePerson(item.id, item.name)}
+    />
+  )
+
+  const lueFilter = () => persons.filter(word => 
+    word.name.toLowerCase().startsWith(filterName)).map(item =>
+    <Note
+      key = {item.id}
+      note = {item}
+      del = {() => deletePerson(item.id, item.name)}
+    />)
+
   useEffect(() => {
     henkiloTiedot
       .getAll()
@@ -68,48 +78,25 @@ function App() {
   }, [])
 
   
-  const lue = () => persons.map(item => <Note
-    key = {item.name}
-    note = {item}
-    del = {() => deletePerson(item.id, item.name)}
-  />)
-
-  
-
-  const lueFilter = () => persons.filter(word => 
-    word.name.toLowerCase().startsWith(filterName)).map(item =>
-    <Note
-      key = {item.name}
-      note = {item}
-      del = {() => deletePerson(item.id, item.name)}
-    />)
+  let id = 0
+  persons.forEach(element => {
+    if(element.name === newName){
+      id = element.id
+    }
+  });  
 
   const deletePerson = (id, name) => {
     if(window.confirm(`Delete ${name} ?`)){
-      //const personId = persons.find(note => note.id === id)
-      
       henkiloTiedot
       .delPyynto(id)
-      .then(returned => {
+      .then(() => {
         setPersons(persons.filter(i => i.id !== id))
-        console.log("Id on " + id)
-        if(errorMessage === null){
-          setMessage(
-            `${name} is deleted, from phonebook`
-          )
-          setTimeout(() => {
-            setMessage(null)
-          }, 3000)
-        }
+        
+        showMessage(`${name} is deleted, from phonebook`, setMessage)
+        
       })
-
       .catch(error  => {
-        setErrorMessage(
-          `info of ${name} is already removed from server`
-        )
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 3000)
+        showMessage(`information of ${name} is already removed from server`, setErrorMessage)
         setPersons(persons.filter(n => n.id !== id))
       })
     }
@@ -124,71 +111,78 @@ function App() {
     return false
   }
 
-  
-  const addPerson = (event) => {
+  const newContactOrUpdate = (event) => {
     event.preventDefault()
+    if(onkoNimi(newName)){
+      if(newNumber.length >= 8){
+        updateNumero()
+      }
+      else{
+        showMessage("Number should be at least 8 numbers long!", setErrorMessage)
+        setNewName("")
+        setNewNumber("")
+      }
+    }
+    else{
+      addNewContact()
+    }
+  }
+
+  const addNewContact = () => {
     const newObject = {
       name: newName,
       number: newNumber
     }
+    henkiloTiedot
+      .create(newObject)
+      .then(returnedNote => {
+        setNewName("")
+        setNewNumber("") 
+        if(newNumber.length < 8){
+          showMessage("Number should be at least 8 numbers long!", setErrorMessage)
+          setPersons(persons.filter(n => n.name !== newName))
+        }
+        else if(newName.length < 3){
+          showMessage("Name should be at least 3 characters long!", setErrorMessage)
+          setPersons(persons.filter(n => n.name !== newName))
+        }
+        else{
+          showMessage(`${newName} is added to phonebook`, setMessage)
+          setPersons(persons.concat(returnedNote))
+        }
+      })
+      .catch(error  => {
+        showMessage(`Error adding new contact`, setErrorMessage)
+        setPersons(persons.filter(n => n.name !== newName))
+      })  
+  }
 
-    let id = 0
-    persons.forEach(element => {
-      if(element.name === newName){
-        id = element.id
-      }
-    });
 
-    if(onkoNimi(newName)){
+  const updateNumero = () => {
+    const note = persons.find(note => note.id === id)
+    const newNote = {...note, number: newNumber}
+    henkiloTiedot
+    .update(id, newNote)
+    .then(returnedNote => {
       alert(`${newName} is already added to phonebook. Replace the old number with a new one?`)
+      setPersons(persons.map(item => item.id !== id ? item : returnedNote))
+      showMessage(`New numero for ${newName} is set`, setMessage)
+      setNewName("")
+      setNewNumber("")
+    })
+    .catch(error  => {
+      showMessage(`information of ${newName} is already removed from server`, setErrorMessage)
+      setPersons(persons.filter(n => n.id !== id))
+      setNewName("")
+      setNewNumber("")
+    })
+  }
 
-      const note = persons.find(note => note.id === id)
-      const newNote = {...note, number: newNumber}
-      
-      henkiloTiedot
-        .update(id, newNote)
-        .then(returnedNote => {
-          setPersons(persons.map(item => item.id !== id ? item : returnedNote))
-
-        if(errorMessage === null){
-            setMessage(
-              `${newName} new number is set`
-            )
-            setTimeout(() => {
-              setMessage(null)
-            }, 3000)
-          }
-          setNewName("")
-          setNewNumber("")
-          })
-          .catch(error  => {
-            setErrorMessage(
-              `information of ${newName} is already removed from server`
-            )
-            setTimeout(() => {
-              setErrorMessage(null)
-            }, 3000)
-            setPersons(persons.filter(n => n.id !== id))
-          })  
-          setNewName("")
-          setNewNumber("")
-          
-    }else{
-      henkiloTiedot
-        .create(newObject)
-          .then(returnedNote => {
-            setPersons(persons.concat(returnedNote))
-            setNewNumber("")
-            setMessage(
-              `${newName} is added to phonebook`
-            )
-            setTimeout(() => {
-              setMessage(null)
-            }, 5000)
-          })
-          setNewName("")
-          setNewNumber("")  
-    }
+  const showMessage = (mess, setMessageStyle) => {
+    setMessageStyle(mess)
+    setTimeout(() => {
+      setMessageStyle(null)
+    }, 5000)
   }
 
   const nameHandler = (event) => {
@@ -212,11 +206,10 @@ function App() {
       <br/>
       <Filter
         onChange = {(event) => setFilter(event.target.value)}
-
       />
       <h2>add a new</h2>
       <UusiHenkilo 
-        addPerson = {addPerson}
+        addPerson = {newContactOrUpdate}
         newName = {newName}
         newNumber = {newNumber}
         nameHandler = {nameHandler}
